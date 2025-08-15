@@ -1831,25 +1831,17 @@ function MagicGameModule() {
   
   const handleCellTap = (row: number, col: number) => {
     console.log('Touch detected:', row, col)
-    console.log('Current mobileSelectedCells:', mobileSelectedCells)
     
     // Verificar si la celda ya está seleccionada
     const isAlreadySelected = mobileSelectedCells.some(([r, c]) => r === row && c === col)
-    console.log('Is already selected:', isAlreadySelected)
     
     // Calcular el nuevo estado de las celdas móviles
     const newMobileSelectedCells = isAlreadySelected 
       ? mobileSelectedCells.filter(([r, c]) => !(r === row && c === col))
       : [...mobileSelectedCells, [row, col]]
     
-    console.log('New mobileSelectedCells:', newMobileSelectedCells)
-    
-    // Permitir selección letra por letra sin restricciones de línea recta
-    // La validación se hará al final cuando se complete la palabra
-    
-    // Actualizar ambos estados
+    // Actualizar solo el estado móvil
     setMobileSelectedCells(newMobileSelectedCells)
-    setSelectedCells(newMobileSelectedCells)
     
     // Si no hay celdas seleccionadas, limpiar todo
     if (newMobileSelectedCells.length === 0) {
@@ -1857,46 +1849,63 @@ function MagicGameModule() {
       return
     }
     
-    // Verificar si la palabra está completa
-    const selectedWord = getSelectedWord()
-    console.log('Selected word:', selectedWord)
-    
-    // Solo verificar palabras que estén en la lista de virtudes
-    const virtue = virtues.find(v => v.word === selectedWord)
-    console.log('Found virtue:', virtue)
-    
-    if (selectedWord && virtue && !foundWords.includes(selectedWord)) {
-      console.log('Checking word validation...')
-      // Verificar que las celdas estén en línea recta
-      const isValidSelection = validateWordSelection(newMobileSelectedCells, selectedWord)
-      console.log('Is valid selection:', isValidSelection)
-      
-      if (isValidSelection) {
-        console.log('Word found! Adding to foundWords')
-        // ¡Palabra encontrada!
-        setFoundWords(prev => [...prev, selectedWord])
-        setLastFoundWord(selectedWord)
-        setTimeout(() => setLastFoundWord(null), 2000)
-        
-        if (foundWords.length + 1 === virtues.length) {
-          setShowCongratulations(true)
-        }
-        
-        // Limpiar selección móvil
-        setMobileSelectedCells([])
-        setSelectedCells([])
-      } else {
-        console.log('Word not valid. Cells:', newMobileSelectedCells)
-        console.log('Expected word:', selectedWord)
+    // Obtener las letras seleccionadas
+    const selectedLetters = newMobileSelectedCells.map(([r, c]) => {
+      if (r >= 0 && r < letterGrid.length && c >= 0 && c < letterGrid[r].length) {
+        return letterGrid[r][c]
       }
-    } else if (selectedWord && !virtue) {
-      // Si la palabra no está en la lista, limpiar la selección
-      console.log('Invalid word detected, clearing selection')
-      setMobileSelectedCells([])
-      setSelectedCells([])
-    } else {
-      console.log('Word not found or already found. Word:', selectedWord, 'Virtue:', virtue, 'Already found:', foundWords.includes(selectedWord || ''))
+      return null
+    }).filter(letter => letter !== null)
+    
+    console.log('Selected letters:', selectedLetters)
+    
+    // Buscar si alguna palabra de virtudes puede formarse con estas letras
+    for (const virtue of virtues) {
+      if (foundWords.includes(virtue.word)) continue // Ya encontrada
+      
+      const wordLetters = virtue.word.split('')
+      
+      // Verificar si todas las letras de la palabra están en las seleccionadas
+      const hasAllLetters = wordLetters.every(letter => selectedLetters.includes(letter))
+      
+      if (hasAllLetters && selectedLetters.length === wordLetters.length) {
+        // Verificar si las celdas están en línea recta
+        const isValidLine = checkCellsInLine(newMobileSelectedCells)
+        
+        if (isValidLine) {
+          console.log('Word found!:', virtue.word)
+          // ¡Palabra encontrada!
+          setFoundWords(prev => [...prev, virtue.word])
+          setLastFoundWord(virtue.word)
+          setTimeout(() => setLastFoundWord(null), 2000)
+          
+          if (foundWords.length + 1 === virtues.length) {
+            setShowCongratulations(true)
+          }
+          
+          // Limpiar selección móvil
+          setMobileSelectedCells([])
+          setSelectedCells([])
+          return
+        }
+      }
     }
+    
+    // Si no se encontró palabra válida, mantener la selección
+    setSelectedCells(newMobileSelectedCells)
+  }
+  
+  const checkCellsInLine = (cells: number[][]) => {
+    if (cells.length <= 1) return true
+    
+    const [firstRow, firstCol] = cells[0]
+    const [lastRow, lastCol] = cells[cells.length - 1]
+    
+    const deltaRow = lastRow - firstRow
+    const deltaCol = lastCol - firstCol
+    
+    // Verificar que sea horizontal, vertical o diagonal perfecta
+    return deltaRow === 0 || deltaCol === 0 || Math.abs(deltaRow) === Math.abs(deltaCol)
   }
   
   const getCellsBetween = (startRow: number, startCol: number, endRow: number, endCol: number) => {
@@ -1936,10 +1945,13 @@ function MagicGameModule() {
   }
   
   const getSelectedWord = () => {
-    if (selectedCells.length === 0) return ""
+    // Para móvil, usar mobileSelectedCells
+    const cellsToUse = isMobile ? mobileSelectedCells : selectedCells
+    
+    if (cellsToUse.length === 0) return ""
     
     let word = ""
-    for (const [row, col] of selectedCells) {
+    for (const [row, col] of cellsToUse) {
       if (row >= 0 && row < letterGrid.length && col >= 0 && col < letterGrid[row].length) {
         word += letterGrid[row][col]
       }
@@ -2023,6 +2035,11 @@ function MagicGameModule() {
   }
   
   const isCellSelected = (row: number, col: number) => {
+    // Para móvil, usar mobileSelectedCells
+    if (isMobile) {
+      return mobileSelectedCells.some(([r, c]) => r === row && c === col)
+    }
+    // Para desktop, usar selectedCells
     return selectedCells.some(([r, c]) => r === row && c === col)
   }
   
@@ -2266,7 +2283,7 @@ function MagicGameModule() {
                   `}
                   onClick={() => !isMobile && handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => !isMobile && handleCellHover(rowIndex, colIndex)}
-                  onTouchStart={(e) => {
+                  onTouchEnd={(e) => {
                     if (isMobile) {
                       e.preventDefault()
                       e.stopPropagation()
