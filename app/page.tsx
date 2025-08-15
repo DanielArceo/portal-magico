@@ -868,6 +868,22 @@ export default function BirthdayLogin() {
       setSelectedModule(null)
     }
     setIsReady(true)
+    
+    // Inicializar la base de datos automáticamente
+    const initDatabase = async () => {
+      try {
+        const response = await fetch('/api/init-db')
+        if (response.ok) {
+          console.log('Base de datos inicializada correctamente')
+        } else {
+          console.warn('Error inicializando base de datos')
+        }
+      } catch (error) {
+        console.warn('Error conectando con la base de datos:', error)
+      }
+    }
+    
+    initDatabase()
   }, [])
 
   useEffect(() => {

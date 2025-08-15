@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sql } from '@/lib/db'
+import { createTables } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,13 @@ export async function POST(request: NextRequest) {
         { error: 'Datos de imagen son requeridos' },
         { status: 400 }
       )
+    }
+
+    // Intentar crear las tablas si no existen
+    try {
+      await createTables()
+    } catch (tableError) {
+      console.warn('Error creando tablas, continuando...:', tableError)
     }
 
     const date = new Date().toLocaleDateString('es-ES')
@@ -33,8 +41,39 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error al guardar dibujo:', error)
+    
+    // Si es un error de tabla no encontrada, intentar crear las tablas
+    if (error instanceof Error && error.message.includes('relation "drawings" does not exist')) {
+      try {
+        await createTables()
+        // Intentar insertar de nuevo
+        const { imageData, title = 'Dibujo de Gaby' } = await request.json()
+        const date = new Date().toLocaleDateString('es-ES')
+        const description = 'Dibujo creado en el Portal Mágico'
+        
+        const result = await sql`
+          INSERT INTO drawings (title, description, image_url, date)
+          VALUES (${title}, ${description}, ${'data:image/png;base64,' + imageData.substring(0, 100) + '...'}, ${date})
+          RETURNING id, title, description, image_url, date, timestamp;
+        `
+        
+        const savedDrawing = result.rows[0]
+        return NextResponse.json({
+          success: true,
+          message: 'Dibujo guardado exitosamente en la base de datos',
+          drawing: savedDrawing
+        })
+      } catch (retryError) {
+        console.error('Error en reintento:', retryError)
+        return NextResponse.json(
+          { error: 'Error al guardar dibujo. Intenta de nuevo.' },
+          { status: 500 }
+        )
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error al guardar dibujo. Intenta de nuevo.' },
       { status: 500 }
     )
   }
