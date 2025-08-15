@@ -5120,12 +5120,32 @@ function CommentsModule() {
             </label>
             <textarea
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e) => {
+                console.log('Textarea onChange:', e.target.value)
+                setComment(e.target.value)
+              }}
+              onKeyDown={(e) => {
+                console.log('Textarea onKeyDown:', e.key)
+              }}
+              onFocus={(e) => {
+                console.log('Textarea focused')
+              }}
+              onBlur={(e) => {
+                console.log('Textarea blurred')
+              }}
               placeholder="Escribe aquí tu comentario, sugerencia o feedback..."
               className="w-full p-3 rounded-lg border-2 border-amber-200 focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition-all duration-200 bg-white resize-none"
               rows={6}
               required
+              style={{ 
+                pointerEvents: 'auto',
+                userSelect: 'auto',
+                WebkitUserSelect: 'auto'
+              }}
             />
+            <div className="text-xs text-gray-500 mt-1">
+              Caracteres: {comment.length} | Estado: {comment ? 'Con texto' : 'Vacío'}
+            </div>
           </div>
 
           {/* Botón de envío */}
