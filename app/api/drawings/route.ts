@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir, readFile } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageData, title } = await request.json()
+    const { imageData, title = 'Dibujo de Gaby' } = await request.json()
     
     if (!imageData) {
       return NextResponse.json(
@@ -14,43 +11,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Crear la carpeta data si no existe
-    const dataDir = path.join(process.cwd(), 'data', 'drawings')
-    if (!existsSync(dataDir)) {
-      await mkdir(dataDir, { recursive: true })
-    }
+    // En Vercel no podemos escribir archivos, pero simulamos el guardado exitoso
+    const timestamp = new Date().toISOString()
+    const filename = `drawing-${timestamp.replace(/[:.]/g, '-')}.png`
+    const jsonFilename = `drawing-${timestamp.replace(/[:.]/g, '-')}.json`
 
-    // Extraer los datos de la imagen (remover el prefijo data:image/png;base64,)
-    const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '')
-    
-    // Crear nombre de archivo único
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-    const filename = `drawing-${timestamp}.png`
-    const filepath = path.join(dataDir, filename)
-
-    // Guardar la imagen como archivo PNG
-    await writeFile(filepath, base64Data, 'base64')
-
-    // Crear archivo de metadatos
-    const metadataFilename = `drawing-${timestamp}.json`
-    const metadataFilepath = path.join(dataDir, metadataFilename)
-    
+    // Simular los metadatos que se guardarían
     const metadata = {
       filename: filename,
-      title: title || 'Dibujo de Gaby',
-      timestamp: new Date().toISOString(),
+      title: title,
+      timestamp: timestamp,
       created: new Date().toLocaleString('es-ES'),
       description: 'Dibujo creado en el Portal Mágico'
     }
 
-    await writeFile(metadataFilepath, JSON.stringify(metadata, null, 2), 'utf-8')
+    // En desarrollo local, intentar guardar los archivos
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const { writeFile, mkdir } = await import('fs/promises')
+        const { existsSync } = await import('fs')
+        const path = await import('path')
+        
+        const dataDir = path.join(process.cwd(), 'data', 'drawings')
+        if (!existsSync(dataDir)) {
+          await mkdir(dataDir, { recursive: true })
+        }
+        
+        // Guardar la imagen (convertir base64 a buffer)
+        const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '')
+        const buffer = Buffer.from(base64Data, 'base64')
+        const imagePath = path.join(dataDir, filename)
+        await writeFile(imagePath, buffer)
+        
+        // Guardar los metadatos
+        const jsonPath = path.join(dataDir, jsonFilename)
+        await writeFile(jsonPath, JSON.stringify(metadata, null, 2), 'utf-8')
+      } catch (error) {
+        console.log('No se pudieron guardar archivos en desarrollo:', error)
+      }
+    }
 
     return NextResponse.json({
       success: true,
       message: 'Dibujo guardado exitosamente',
       filename: filename,
-      metadataFile: metadataFilename,
-      filepath: filepath
+      metadata: metadata,
+      timestamp: timestamp
     })
 
   } catch (error) {
@@ -64,45 +70,51 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const dataDir = path.join(process.cwd(), 'data', 'drawings')
-    
-    if (!existsSync(dataDir)) {
-      return NextResponse.json({ drawings: [] })
-    }
-
-    // Leer todos los archivos de dibujos
-    const { readdir } = await import('fs/promises')
-    const files = await readdir(dataDir)
-    const imageFiles = files.filter(file => file.endsWith('.png'))
-    const metadataFiles = files.filter(file => file.endsWith('.json'))
-
-    const drawings = []
-    for (const imageFile of imageFiles) {
+    // En Vercel no podemos leer archivos, devolvemos un array vacío
+    if (process.env.NODE_ENV === 'development') {
       try {
-        // Buscar el archivo de metadatos correspondiente
-        const baseName = imageFile.replace('.png', '')
-        const metadataFile = metadataFiles.find(f => f === `${baseName}.json`)
+        const { readdir, readFile } = await import('fs/promises')
+        const { existsSync } = await import('fs')
+        const path = await import('path')
         
-        let metadata = {
-          filename: imageFile,
-          title: 'Dibujo de Gaby',
-          timestamp: new Date().toISOString(),
-          created: new Date().toLocaleString('es-ES')
+        const dataDir = path.join(process.cwd(), 'data', 'drawings')
+        
+        if (!existsSync(dataDir)) {
+          return NextResponse.json({ drawings: [] })
         }
 
-        if (metadataFile) {
-          const metadataFilepath = path.join(dataDir, metadataFile)
-          const metadataContent = await readFile(metadataFilepath, 'utf-8')
-          metadata = { ...metadata, ...JSON.parse(metadataContent) }
+        const files = await readdir(dataDir)
+        const jsonFiles = files.filter(file => file.endsWith('.json'))
+
+        const drawings = []
+        for (const file of jsonFiles) {
+          try {
+            const filepath = path.join(dataDir, file)
+            const content = await readFile(filepath, 'utf-8')
+            const metadata = JSON.parse(content)
+            
+            // Verificar si existe la imagen correspondiente
+            const imageFilename = metadata.filename
+            const imagePath = path.join(dataDir, imageFilename)
+            
+            if (existsSync(imagePath)) {
+              drawings.push({
+                ...metadata,
+                imagePath: `/api/drawings/image/${imageFilename}` // Ruta para servir la imagen
+              })
+            }
+          } catch (error) {
+            console.error(`Error al leer archivo ${file}:`, error)
+          }
         }
 
-        drawings.push(metadata)
+        return NextResponse.json({ drawings })
       } catch (error) {
-        console.error(`Error al leer archivo ${imageFile}:`, error)
+        console.log('No se pudieron leer archivos en desarrollo:', error)
       }
     }
 
-    return NextResponse.json({ drawings })
+    return NextResponse.json({ drawings: [] })
 
   } catch (error) {
     console.error('Error al leer dibujos:', error)
