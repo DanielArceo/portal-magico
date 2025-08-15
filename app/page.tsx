@@ -1815,51 +1815,50 @@ function MagicGameModule() {
     }
   }
 
-  // Sistema móvil: dos toques para seleccionar palabra
-  const [mobileFirstTap, setMobileFirstTap] = useState<[number, number] | null>(null)
+  // Sistema móvil: selección letra por letra
+  const [mobileSelectedCells, setMobileSelectedCells] = useState<number[][]>([])
   
   const handleCellTap = (row: number, col: number) => {
-    console.log('Touch detected:', row, col, 'First tap:', mobileFirstTap)
+    // Verificar si la celda ya está seleccionada
+    const isAlreadySelected = mobileSelectedCells.some(([r, c]) => r === row && c === col)
     
-    if (!mobileFirstTap) {
-      // Primer toque - marcar inicio
-      console.log('Setting first tap')
-      setMobileFirstTap([row, col])
-      setSelectedCells([[row, col]])
+    if (isAlreadySelected) {
+      // Si ya está seleccionada, la deseleccionamos
+      setMobileSelectedCells(prev => prev.filter(([r, c]) => !(r === row && c === col)))
     } else {
-      // Segundo toque - completar selección
-      console.log('Processing second tap')
-      const [startRow, startCol] = mobileFirstTap
-      const cells = getCellsBetween(startRow, startCol, row, col)
-      console.log('Cells between:', cells)
-      setSelectedCells(cells)
+      // Agregar la nueva celda
+      setMobileSelectedCells(prev => [...prev, [row, col]])
+    }
+    
+    // Actualizar las celdas seleccionadas para mostrar
+    const newSelectedCells = isAlreadySelected 
+      ? mobileSelectedCells.filter(([r, c]) => !(r === row && c === col))
+      : [...mobileSelectedCells, [row, col]]
+    
+    setSelectedCells(newSelectedCells)
+    
+    // Verificar si la palabra está completa
+    const selectedWord = getSelectedWord()
+    const virtue = virtues.find(v => v.word === selectedWord)
+    
+    if (selectedWord && virtue && !foundWords.includes(selectedWord)) {
+      // Verificar que las celdas estén en línea recta
+      const isValidSelection = validateWordSelection(newSelectedCells, selectedWord)
       
-      const selectedWord = getSelectedWord()
-      console.log('Selected word:', selectedWord)
-      const virtue = virtues.find(v => v.word === selectedWord)
-      
-      // Verificar si es una palabra válida
-      if (selectedWord && virtue && !foundWords.includes(selectedWord) && cells.length > 1) {
-        // Verificar que las celdas estén en línea recta
-        const isValidSelection = validateWordSelection(cells, selectedWord)
-        console.log('Is valid selection:', isValidSelection)
+      if (isValidSelection) {
+        // ¡Palabra encontrada!
+        setFoundWords(prev => [...prev, selectedWord])
+        setLastFoundWord(selectedWord)
+        setTimeout(() => setLastFoundWord(null), 2000)
         
-        if (isValidSelection) {
-          // ¡Palabra encontrada!
-          console.log('Word found!')
-          setFoundWords(prev => [...prev, selectedWord])
-          setLastFoundWord(selectedWord)
-          setTimeout(() => setLastFoundWord(null), 2000)
-          
-          if (foundWords.length + 1 === virtues.length) {
-            setShowCongratulations(true)
-          }
+        if (foundWords.length + 1 === virtues.length) {
+          setShowCongratulations(true)
         }
+        
+        // Limpiar selección móvil
+        setMobileSelectedCells([])
+        setSelectedCells([])
       }
-      
-      // Resetear para la siguiente selección
-      setMobileFirstTap(null)
-      setSelectedCells([])
     }
   }
   
@@ -2204,19 +2203,19 @@ function MagicGameModule() {
           )}
           
           {/* Indicador móvil */}
-          {mobileFirstTap && (
+          {mobileSelectedCells.length > 0 && (
             <div className="text-center mb-4">
               <p className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
-                📱 Toca la última letra de la palabra para completar la selección
+                📱 Seleccionadas: {mobileSelectedCells.length} letras | Toca letra por letra para formar la palabra
               </p>
               <button 
                 onClick={() => {
-                  setMobileFirstTap(null)
+                  setMobileSelectedCells([])
                   setSelectedCells([])
                 }}
                 className="mt-2 px-3 py-1 text-xs bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
               >
-                🔄 Reiniciar selección
+                🔄 Limpiar selección
               </button>
             </div>
           )}
@@ -2228,7 +2227,7 @@ function MagicGameModule() {
               <br />
               <span className="hidden sm:inline">Desktop:</span> Haz clic y arrastra en línea recta para seleccionar.
               <br />
-              <span className="sm:hidden">Móvil:</span> Toca la primera letra, luego toca la última letra de la palabra.
+              <span className="sm:hidden">Móvil:</span> Toca letra por letra para formar la palabra. Toca de nuevo para deseleccionar.
               <br />
               Las palabras están en horizontal, vertical o diagonal.
             </p>
