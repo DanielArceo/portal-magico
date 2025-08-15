@@ -1939,7 +1939,37 @@ function MagicGameModule() {
     // Verificar que las celdas estén en línea recta
     if (cells.length <= 1) return false
     
-    // Verificar que las celdas estén en línea recta (horizontal, vertical o diagonal)
+    // Para móvil, verificar que las letras coincidan sin importar el orden
+    if (isMobile) {
+      const selectedLetters = cells.map(([row, col]) => {
+        if (row < 0 || row >= letterGrid.length || col < 0 || col >= letterGrid[row].length) {
+          return null
+        }
+        return letterGrid[row][col]
+      }).filter(letter => letter !== null)
+      
+      // Verificar que todas las letras de la palabra estén en las celdas seleccionadas
+      const wordLetters = word.split('')
+      const hasAllLetters = wordLetters.every(letter => selectedLetters.includes(letter))
+      
+      if (!hasAllLetters) return false
+      
+      // Verificar que las celdas estén en línea recta
+      const [firstRow, firstCol] = cells[0]
+      const [lastRow, lastCol] = cells[cells.length - 1]
+      
+      const deltaRow = lastRow - firstRow
+      const deltaCol = lastCol - firstCol
+      
+      // Verificar que sea horizontal, vertical o diagonal perfecta
+      if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) {
+        return false
+      }
+      
+      return true
+    }
+    
+    // Para desktop, validación estricta
     const [firstRow, firstCol] = cells[0]
     const [lastRow, lastCol] = cells[cells.length - 1]
     
