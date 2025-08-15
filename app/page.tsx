@@ -1815,39 +1815,45 @@ function MagicGameModule() {
     }
   }
 
-  // Sistema de selección por dos toques - perfecto para móviles
+  // Sistema móvil: dos toques para seleccionar palabra
+  const [mobileFirstTap, setMobileFirstTap] = useState<[number, number] | null>(null)
+  
   const handleCellTap = (row: number, col: number) => {
-    if (!isSelecting) {
-      // Primer toque - empezar selección
-      setStartCell([row, col])
-      setIsSelecting(true)
+    // Prevenir el comportamiento por defecto del touch
+    event?.preventDefault()
+    
+    if (!mobileFirstTap) {
+      // Primer toque - marcar inicio
+      setMobileFirstTap([row, col])
       setSelectedCells([[row, col]])
     } else {
       // Segundo toque - completar selección
-      const [startRow, startCol] = startCell!
+      const [startRow, startCol] = mobileFirstTap
       const cells = getCellsBetween(startRow, startCol, row, col)
       setSelectedCells(cells)
       
       const selectedWord = getSelectedWord()
       const virtue = virtues.find(v => v.word === selectedWord)
       
-      // Verificar que la palabra sea válida y esté en línea recta
+      // Verificar si es una palabra válida
       if (selectedWord && virtue && !foundWords.includes(selectedWord) && cells.length > 1) {
-        // Verificar que las celdas seleccionadas estén en línea recta
+        // Verificar que las celdas estén en línea recta
         const isValidSelection = validateWordSelection(cells, selectedWord)
         
         if (isValidSelection) {
-          // Palabra válida encontrada
+          // ¡Palabra encontrada!
           setFoundWords(prev => [...prev, selectedWord])
           setLastFoundWord(selectedWord)
           setTimeout(() => setLastFoundWord(null), 2000)
+          
           if (foundWords.length + 1 === virtues.length) {
             setShowCongratulations(true)
           }
         }
       }
-      setIsSelecting(false)
-      setStartCell(null)
+      
+      // Resetear para la siguiente selección
+      setMobileFirstTap(null)
       setSelectedCells([])
     }
   }
@@ -2175,7 +2181,10 @@ function MagicGameModule() {
                   `}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => handleCellHover(rowIndex, colIndex)}
-                  onTouchEnd={() => handleCellTap(rowIndex, colIndex)}
+                  onTouchStart={(e) => {
+                    e.preventDefault()
+                    handleCellTap(rowIndex, colIndex)
+                  }}
                 >
                   {letter}
                 </div>
@@ -2188,6 +2197,15 @@ function MagicGameModule() {
             <div className="text-center mb-4">
               <p className="text-lg font-bold text-purple-600">
                 Palabra seleccionada: <span className="bg-purple-100 px-3 py-1 rounded-lg">{getSelectedWord()}</span>
+              </p>
+            </div>
+          )}
+          
+          {/* Indicador móvil */}
+          {mobileFirstTap && (
+            <div className="text-center mb-4">
+              <p className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
+                📱 Toca la última letra de la palabra para completar la selección
               </p>
             </div>
           )}
