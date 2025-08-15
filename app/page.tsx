@@ -1850,13 +1850,18 @@ function MagicGameModule() {
     
     // Verificar si la palabra está completa
     const selectedWord = getSelectedWord()
+    console.log('Selected word:', selectedWord)
     const virtue = virtues.find(v => v.word === selectedWord)
+    console.log('Found virtue:', virtue)
     
     if (selectedWord && virtue && !foundWords.includes(selectedWord)) {
+      console.log('Checking word validation...')
       // Verificar que las celdas estén en línea recta
       const isValidSelection = validateWordSelection(newMobileSelectedCells, selectedWord)
+      console.log('Is valid selection:', isValidSelection)
       
       if (isValidSelection) {
+        console.log('Word found! Adding to foundWords')
         // ¡Palabra encontrada!
         setFoundWords(prev => [...prev, selectedWord])
         setLastFoundWord(selectedWord)
@@ -1869,7 +1874,12 @@ function MagicGameModule() {
         // Limpiar selección móvil
         setMobileSelectedCells([])
         setSelectedCells([])
+      } else {
+        console.log('Word not valid. Cells:', newMobileSelectedCells)
+        console.log('Expected word:', selectedWord)
       }
+    } else {
+      console.log('Word not found or already found. Word:', selectedWord, 'Virtue:', virtue, 'Already found:', foundWords.includes(selectedWord || ''))
     }
   }
   
@@ -1927,24 +1937,32 @@ function MagicGameModule() {
     // Verificar que las celdas estén en línea recta
     if (cells.length <= 1) return false
     
-    const [firstRow, firstCol] = cells[0]
-    const [lastRow, lastCol] = cells[cells.length - 1]
-    
-    const deltaRow = lastRow - firstRow
-    const deltaCol = lastCol - firstCol
-    
-    // Verificar que sea horizontal, vertical o diagonal perfecta
-    if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) {
-      return false
-    }
-    
-    // Verificar que las letras coincidan exactamente
-    for (let i = 0; i < cells.length; i++) {
-      const [row, col] = cells[i]
+    // Para selección manual (móvil), solo verificar que las letras coincidan
+    // sin importar el orden de selección
+    const selectedLetters = cells.map(([row, col]) => {
       if (row < 0 || row >= letterGrid.length || col < 0 || col >= letterGrid[row].length) {
-        return false
+        return null
       }
-      if (letterGrid[row][col] !== word[i]) {
+      return letterGrid[row][col]
+    }).filter(letter => letter !== null)
+    
+    // Verificar que todas las letras de la palabra estén en las celdas seleccionadas
+    const wordLetters = word.split('')
+    const hasAllLetters = wordLetters.every(letter => selectedLetters.includes(letter))
+    
+    if (!hasAllLetters) return false
+    
+    // Verificar que las celdas estén en línea recta (opcional para móvil)
+    // Solo si hay más de 2 letras
+    if (cells.length > 2) {
+      const [firstRow, firstCol] = cells[0]
+      const [lastRow, lastCol] = cells[cells.length - 1]
+      
+      const deltaRow = lastRow - firstRow
+      const deltaCol = lastCol - firstCol
+      
+      // Verificar que sea horizontal, vertical o diagonal perfecta
+      if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) {
         return false
       }
     }
