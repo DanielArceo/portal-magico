@@ -1815,10 +1815,41 @@ function MagicGameModule() {
     }
   }
 
-  // Sistema simple para móviles - solo click/tap
+  // Sistema de selección por dos toques - perfecto para móviles
   const handleCellTap = (row: number, col: number) => {
-    // En móviles, usar el mismo sistema que desktop pero con click
-    handleCellClick(row, col)
+    if (!isSelecting) {
+      // Primer toque - empezar selección
+      setStartCell([row, col])
+      setIsSelecting(true)
+      setSelectedCells([[row, col]])
+    } else {
+      // Segundo toque - completar selección
+      const [startRow, startCol] = startCell!
+      const cells = getCellsBetween(startRow, startCol, row, col)
+      setSelectedCells(cells)
+      
+      const selectedWord = getSelectedWord()
+      const virtue = virtues.find(v => v.word === selectedWord)
+      
+      // Verificar que la palabra sea válida y esté en línea recta
+      if (selectedWord && virtue && !foundWords.includes(selectedWord) && cells.length > 1) {
+        // Verificar que las celdas seleccionadas estén en línea recta
+        const isValidSelection = validateWordSelection(cells, selectedWord)
+        
+        if (isValidSelection) {
+          // Palabra válida encontrada
+          setFoundWords(prev => [...prev, selectedWord])
+          setLastFoundWord(selectedWord)
+          setTimeout(() => setLastFoundWord(null), 2000)
+          if (foundWords.length + 1 === virtues.length) {
+            setShowCongratulations(true)
+          }
+        }
+      }
+      setIsSelecting(false)
+      setStartCell(null)
+      setSelectedCells([])
+    }
   }
   
   const getCellsBetween = (startRow: number, startCol: number, endRow: number, endCol: number) => {
@@ -2144,6 +2175,7 @@ function MagicGameModule() {
                   `}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => handleCellHover(rowIndex, colIndex)}
+                  onTouchEnd={() => handleCellTap(rowIndex, colIndex)}
                 >
                   {letter}
                 </div>
@@ -2165,11 +2197,11 @@ function MagicGameModule() {
             <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
               💡 <strong>Instrucciones:</strong> 
               <br />
-              Haz clic/toca una letra y arrastra en línea recta para seleccionar.
+              <span className="hidden sm:inline">Desktop:</span> Haz clic y arrastra en línea recta para seleccionar.
+              <br />
+              <span className="sm:hidden">Móvil:</span> Toca la primera letra, luego toca la última letra de la palabra.
               <br />
               Las palabras están en horizontal, vertical o diagonal.
-              <br />
-              <span className="text-xs text-gray-500">💡 En móvil: Toca y mantén presionado mientras arrastras</span>
             </p>
           </div>
         </div>
