@@ -1819,23 +1819,23 @@ function MagicGameModule() {
   const [mobileSelectedCells, setMobileSelectedCells] = useState<number[][]>([])
   
   const handleCellTap = (row: number, col: number) => {
+    console.log('Touch detected:', row, col)
+    console.log('Current mobileSelectedCells:', mobileSelectedCells)
+    
     // Verificar si la celda ya está seleccionada
     const isAlreadySelected = mobileSelectedCells.some(([r, c]) => r === row && c === col)
+    console.log('Is already selected:', isAlreadySelected)
     
-    if (isAlreadySelected) {
-      // Si ya está seleccionada, la deseleccionamos
-      setMobileSelectedCells(prev => prev.filter(([r, c]) => !(r === row && c === col)))
-    } else {
-      // Agregar la nueva celda
-      setMobileSelectedCells(prev => [...prev, [row, col]])
-    }
-    
-    // Actualizar las celdas seleccionadas para mostrar
-    const newSelectedCells = isAlreadySelected 
+    // Calcular el nuevo estado de las celdas móviles
+    const newMobileSelectedCells = isAlreadySelected 
       ? mobileSelectedCells.filter(([r, c]) => !(r === row && c === col))
       : [...mobileSelectedCells, [row, col]]
     
-    setSelectedCells(newSelectedCells)
+    console.log('New mobileSelectedCells:', newMobileSelectedCells)
+    
+    // Actualizar ambos estados
+    setMobileSelectedCells(newMobileSelectedCells)
+    setSelectedCells(newMobileSelectedCells)
     
     // Verificar si la palabra está completa
     const selectedWord = getSelectedWord()
@@ -1843,7 +1843,7 @@ function MagicGameModule() {
     
     if (selectedWord && virtue && !foundWords.includes(selectedWord)) {
       // Verificar que las celdas estén en línea recta
-      const isValidSelection = validateWordSelection(newSelectedCells, selectedWord)
+      const isValidSelection = validateWordSelection(newMobileSelectedCells, selectedWord)
       
       if (isValidSelection) {
         // ¡Palabra encontrada!
