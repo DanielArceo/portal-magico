@@ -1844,22 +1844,8 @@ function MagicGameModule() {
     
     console.log('New mobileSelectedCells:', newMobileSelectedCells)
     
-    // Verificar que las celdas estén en línea recta
-    if (newMobileSelectedCells.length > 1) {
-      const [firstRow, firstCol] = newMobileSelectedCells[0]
-      const [lastRow, lastCol] = newMobileSelectedCells[newMobileSelectedCells.length - 1]
-      
-      const deltaRow = lastRow - firstRow
-      const deltaCol = lastCol - firstCol
-      
-      // Si no están en línea recta, limpiar la selección anterior y empezar nueva
-      if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) {
-        console.log('Cells not in line, starting new selection')
-        setMobileSelectedCells([[row, col]])
-        setSelectedCells([[row, col]])
-        return
-      }
-    }
+    // Permitir selección letra por letra sin restricciones de línea recta
+    // La validación se hará al final cuando se complete la palabra
     
     // Actualizar ambos estados
     setMobileSelectedCells(newMobileSelectedCells)
