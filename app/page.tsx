@@ -1819,29 +1819,34 @@ function MagicGameModule() {
   const [mobileFirstTap, setMobileFirstTap] = useState<[number, number] | null>(null)
   
   const handleCellTap = (row: number, col: number) => {
-    // Prevenir el comportamiento por defecto del touch
-    event?.preventDefault()
+    console.log('Touch detected:', row, col, 'First tap:', mobileFirstTap)
     
     if (!mobileFirstTap) {
       // Primer toque - marcar inicio
+      console.log('Setting first tap')
       setMobileFirstTap([row, col])
       setSelectedCells([[row, col]])
     } else {
       // Segundo toque - completar selección
+      console.log('Processing second tap')
       const [startRow, startCol] = mobileFirstTap
       const cells = getCellsBetween(startRow, startCol, row, col)
+      console.log('Cells between:', cells)
       setSelectedCells(cells)
       
       const selectedWord = getSelectedWord()
+      console.log('Selected word:', selectedWord)
       const virtue = virtues.find(v => v.word === selectedWord)
       
       // Verificar si es una palabra válida
       if (selectedWord && virtue && !foundWords.includes(selectedWord) && cells.length > 1) {
         // Verificar que las celdas estén en línea recta
         const isValidSelection = validateWordSelection(cells, selectedWord)
+        console.log('Is valid selection:', isValidSelection)
         
         if (isValidSelection) {
           // ¡Palabra encontrada!
+          console.log('Word found!')
           setFoundWords(prev => [...prev, selectedWord])
           setLastFoundWord(selectedWord)
           setTimeout(() => setLastFoundWord(null), 2000)
@@ -2181,10 +2186,7 @@ function MagicGameModule() {
                   `}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => handleCellHover(rowIndex, colIndex)}
-                  onTouchStart={(e) => {
-                    e.preventDefault()
-                    handleCellTap(rowIndex, colIndex)
-                  }}
+                  onTouchEnd={() => handleCellTap(rowIndex, colIndex)}
                 >
                   {letter}
                 </div>
@@ -2207,6 +2209,15 @@ function MagicGameModule() {
               <p className="text-sm font-medium text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
                 📱 Toca la última letra de la palabra para completar la selección
               </p>
+              <button 
+                onClick={() => {
+                  setMobileFirstTap(null)
+                  setSelectedCells([])
+                }}
+                className="mt-2 px-3 py-1 text-xs bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+              >
+                🔄 Reiniciar selección
+              </button>
             </div>
           )}
           
