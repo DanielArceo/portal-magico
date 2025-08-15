@@ -1814,6 +1814,49 @@ function MagicGameModule() {
       setSelectedCells(cells)
     }
   }
+
+  // Funciones para soporte táctil
+  const handleTouchStart = (row: number, col: number) => {
+    if (!isSelecting) {
+      setStartCell([row, col])
+      setIsSelecting(true)
+      setSelectedCells([[row, col]])
+    }
+  }
+
+  const handleTouchMove = (row: number, col: number) => {
+    if (isSelecting && startCell) {
+      const [startRow, startCol] = startCell
+      const cells = getCellsBetween(startRow, startCol, row, col)
+      setSelectedCells(cells)
+    }
+  }
+
+  const handleTouchEnd = (row: number, col: number) => {
+    if (isSelecting) {
+      const selectedWord = getSelectedWord()
+      const virtue = virtues.find(v => v.word === selectedWord)
+      
+      // Verificar que la palabra sea válida y esté en línea recta
+      if (selectedWord && virtue && !foundWords.includes(selectedWord) && selectedCells.length > 1) {
+        // Verificar que las celdas seleccionadas estén en línea recta
+        const isValidSelection = validateWordSelection(selectedCells, selectedWord)
+        
+        if (isValidSelection) {
+          // Palabra válida encontrada
+          setFoundWords(prev => [...prev, selectedWord])
+          setLastFoundWord(selectedWord)
+          setTimeout(() => setLastFoundWord(null), 2000)
+          if (foundWords.length + 1 === virtues.length) {
+            setShowCongratulations(true)
+          }
+        }
+      }
+      setIsSelecting(false)
+      setStartCell(null)
+      setSelectedCells([])
+    }
+  }
   
   const getCellsBetween = (startRow: number, startCol: number, endRow: number, endCol: number) => {
     const cells: number[][] = []
@@ -2128,7 +2171,7 @@ function MagicGameModule() {
                     flex items-center justify-center font-bold rounded cursor-pointer
                     grow basis-0 min-w-0 h-auto aspect-square
                     text-[3vw] sm:text-sm md:text-base
-                    transition-all duration-200 select-none
+                    transition-all duration-200 select-none touch-none
                     ${isCellSelected(rowIndex, colIndex)
                       ? 'bg-purple-400 text-white shadow-lg scale-110'
                       : isCellFound(rowIndex, colIndex)
@@ -2138,6 +2181,9 @@ function MagicGameModule() {
                   `}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => handleCellHover(rowIndex, colIndex)}
+                  onTouchStart={() => handleTouchStart(rowIndex, colIndex)}
+                  onTouchMove={() => handleTouchMove(rowIndex, colIndex)}
+                  onTouchEnd={() => handleTouchEnd(rowIndex, colIndex)}
                 >
                   {letter}
                 </div>
@@ -2157,7 +2203,13 @@ function MagicGameModule() {
           {/* Instrucciones */}
           <div className="text-center">
             <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-              💡 <strong>Instrucciones:</strong> Selecciona una letra y arrastra en línea recta para seleccionar. Las palabras estan colocadas en horizontal, vertical o diagonal..
+              💡 <strong>Instrucciones:</strong> 
+              <br />
+              <span className="hidden sm:inline">Desktop:</span> Haz clic y arrastra en línea recta para seleccionar.
+              <br />
+              <span className="sm:hidden">Móvil:</span> Toca una letra y desliza el dedo en línea recta.
+              <br />
+              Las palabras están en horizontal, vertical o diagonal.
             </p>
           </div>
         </div>
