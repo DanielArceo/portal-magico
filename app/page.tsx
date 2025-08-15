@@ -1005,14 +1005,46 @@ export default function BirthdayLogin() {
     }
   }
 
-  // Función para abrir la carpeta de datos
-  const openDataFolder = () => {
+  // Función para ver datos guardados
+  const viewSavedData = () => {
     if (typeof window !== 'undefined') {
-      // En desarrollo, mostrar información sobre la carpeta
-      alert(`📁 Los archivos se guardan en la carpeta 'data' del proyecto:\n\n` +
-            `📂 data/wishes/ - Deseos mágicos (.txt)\n` +
-            `📂 data/drawings/ - Dibujos del Portal Mágico (.png + .json)\n\n` +
-            `💡 Los archivos se crean automáticamente cuando guardas deseos o dibujos.`)
+      const wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]')
+      const comments = JSON.parse(localStorage.getItem('comments') || '[]')
+      const drawings = JSON.parse(localStorage.getItem('savedDrawings') || '[]')
+      
+      let message = `📊 DATOS GUARDADOS EN TU NAVEGADOR 📊\n\n`
+      
+      // Deseos
+      message += `🎂 DESEOS MÁGICOS (${wishes.length}):\n`
+      if (wishes.length > 0) {
+        wishes.forEach((wish, index) => {
+          message += `${index + 1}. "${wish.text}" - ${wish.date}\n`
+        })
+      } else {
+        message += `   No hay deseos guardados aún\n`
+      }
+      
+      message += `\n💬 COMENTARIOS (${comments.length}):\n`
+      if (comments.length > 0) {
+        comments.forEach((comment, index) => {
+          message += `${index + 1}. "${comment.text}" - ${comment.date}\n`
+        })
+      } else {
+        message += `   No hay comentarios guardados aún\n`
+      }
+      
+      message += `\n🎨 DIBUJOS (${drawings.length}):\n`
+      if (drawings.length > 0) {
+        drawings.forEach((drawing, index) => {
+          message += `${index + 1}. "${drawing.title}" - ${drawing.date}\n`
+        })
+      } else {
+        message += `   No hay dibujos guardados aún\n`
+      }
+      
+      message += `\n💡 Los datos se guardan automáticamente en tu navegador.`
+      
+      alert(message)
     }
   }
 
@@ -1429,8 +1461,15 @@ export default function BirthdayLogin() {
           </div>
         </div>
 
-        {/* Botón de administración */}
-        <div className="text-center mt-4">
+        {/* Botones de administración */}
+        <div className="text-center mt-4 space-y-2">
+          <Button
+            onClick={viewSavedData}
+            variant="outline"
+            className="bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-white/30 hover:border-white/50 transition-all duration-300 shadow-lg mr-2"
+          >
+            📊 Ver Datos Guardados
+          </Button>
           <Button
             onClick={resetAllProgress}
             variant="outline"
