@@ -2541,7 +2541,7 @@ function PlaylistModule() {
       {/* Mensaje de desbloqueo */}
       {showUnlockMessage && lastUnlockedSong !== null && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl shadow-2xl text-center animate-bounce">
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl shadow-2xl text-center animate-fadeInUp">
             <h3 className="text-2xl font-bold mb-2">🎉 ¡Nueva Canción Desbloqueada! 🎉</h3>
             <p className="text-xl font-bold">{playlistSongs[lastUnlockedSong].title}</p>
             <p className="text-lg mt-2">¡Continúa descubriendo nuestra historia! ✨</p>
