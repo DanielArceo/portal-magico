@@ -1815,32 +1815,26 @@ function MagicGameModule() {
     }
   }
 
-  // Funciones para soporte táctil
-  const handleTouchStart = (row: number, col: number) => {
+  // Sistema simplificado para móviles - selección por tap
+  const handleCellTap = (row: number, col: number) => {
     if (!isSelecting) {
+      // Primer tap - empezar selección
       setStartCell([row, col])
       setIsSelecting(true)
       setSelectedCells([[row, col]])
-    }
-  }
-
-  const handleTouchMove = (row: number, col: number) => {
-    if (isSelecting && startCell) {
-      const [startRow, startCol] = startCell
+    } else {
+      // Segundo tap - completar selección
+      const [startRow, startCol] = startCell!
       const cells = getCellsBetween(startRow, startCol, row, col)
       setSelectedCells(cells)
-    }
-  }
-
-  const handleTouchEnd = (row: number, col: number) => {
-    if (isSelecting) {
+      
       const selectedWord = getSelectedWord()
       const virtue = virtues.find(v => v.word === selectedWord)
       
       // Verificar que la palabra sea válida y esté en línea recta
-      if (selectedWord && virtue && !foundWords.includes(selectedWord) && selectedCells.length > 1) {
+      if (selectedWord && virtue && !foundWords.includes(selectedWord) && cells.length > 1) {
         // Verificar que las celdas seleccionadas estén en línea recta
-        const isValidSelection = validateWordSelection(selectedCells, selectedWord)
+        const isValidSelection = validateWordSelection(cells, selectedWord)
         
         if (isValidSelection) {
           // Palabra válida encontrada
@@ -2181,9 +2175,7 @@ function MagicGameModule() {
                   `}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onMouseEnter={() => handleCellHover(rowIndex, colIndex)}
-                  onTouchStart={() => handleTouchStart(rowIndex, colIndex)}
-                  onTouchMove={() => handleTouchMove(rowIndex, colIndex)}
-                  onTouchEnd={() => handleTouchEnd(rowIndex, colIndex)}
+                  onTouchEnd={() => handleCellTap(rowIndex, colIndex)}
                 >
                   {letter}
                 </div>
@@ -2207,7 +2199,7 @@ function MagicGameModule() {
               <br />
               <span className="hidden sm:inline">Desktop:</span> Haz clic y arrastra en línea recta para seleccionar.
               <br />
-              <span className="sm:hidden">Móvil:</span> Toca una letra y desliza el dedo en línea recta.
+              <span className="sm:hidden">Móvil:</span> Toca la primera letra, luego toca la última letra de la palabra.
               <br />
               Las palabras están en horizontal, vertical o diagonal.
             </p>
