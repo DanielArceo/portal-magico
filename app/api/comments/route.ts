@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sql } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,49 +12,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // En Vercel no podemos escribir archivos, pero simulamos el guardado exitoso
-    const timestamp = new Date().toISOString()
-    const filename = `comment-${timestamp.replace(/[:.]/g, '-')}.txt`
+    const date = new Date().toLocaleDateString('es-ES')
 
-    // Simular el contenido que se guardaría
-    const content = `💬 COMENTARIO Y SUGERENCIA DE GABY 💬
-📅 Fecha: ${new Date().toLocaleDateString('es-ES')}
-⏰ Timestamp: ${timestamp}
-🎯 Tipo: ${type}
-⭐ Calificación: ${'⭐'.repeat(rating)}
-📱 Módulo: ${module}
-💭 Comentario: ${comment}
+    // Guardar en la base de datos
+    const result = await sql`
+      INSERT INTO comments (text, type, rating, module, date)
+      VALUES (${comment}, ${type}, ${rating}, ${module}, ${date})
+      RETURNING id, text, type, rating, module, date, timestamp;
+    `
 
----
-💝 Guardado con amor en el Portal Mágico
-🌟 Tus comentarios nos ayudan a mejorar
-`
-
-    // En desarrollo local, intentar guardar el archivo
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { writeFile, mkdir } = await import('fs/promises')
-        const { existsSync } = await import('fs')
-        const path = await import('path')
-        
-        const dataDir = path.join(process.cwd(), 'data', 'comments')
-        if (!existsSync(dataDir)) {
-          await mkdir(dataDir, { recursive: true })
-        }
-        
-        const filepath = path.join(dataDir, filename)
-        await writeFile(filepath, content, 'utf-8')
-      } catch (error) {
-        console.log('No se pudo guardar archivo en desarrollo:', error)
-      }
-    }
+    const savedComment = result.rows[0]
 
     return NextResponse.json({
       success: true,
-      message: 'Comentario guardado exitosamente',
-      filename: filename,
-      content: content,
-      timestamp: timestamp
+      message: 'Comentario guardado exitosamente en la base de datos',
+      comment: savedComment
     })
 
   } catch (error) {
@@ -67,52 +40,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // En Vercel no podemos leer archivos, devolvemos un array vacío
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { readdir, readFile } = await import('fs/promises')
-        const { existsSync } = await import('fs')
-        const path = await import('path')
-        
-        const dataDir = path.join(process.cwd(), 'data', 'comments')
-        
-        if (!existsSync(dataDir)) {
-          return NextResponse.json({ comments: [] })
-        }
+    // Obtener todos los comentarios de la base de datos
+    const result = await sql`
+      SELECT id, text, type, rating, module, date, timestamp
+      FROM comments
+      ORDER BY timestamp DESC;
+    `
 
-        const files = await readdir(dataDir)
-        const commentFiles = files.filter(file => file.endsWith('.txt'))
-
-        const comments = []
-        for (const file of commentFiles) {
-          try {
-            const filepath = path.join(dataDir, file)
-            const content = await readFile(filepath, 'utf-8')
-            const lines = content.split('\n')
-            
-            const comment = {
-              filename: file,
-              content: content,
-              date: lines[1]?.replace('📅 Fecha: ', '') || '',
-              timestamp: lines[2]?.replace('⏰ Timestamp: ', '') || '',
-              type: lines[3]?.replace('🎯 Tipo: ', '') || '',
-              rating: lines[4]?.replace('⭐ Calificación: ', '') || '',
-              module: lines[5]?.replace('📱 Módulo: ', '') || '',
-              comment: lines[6]?.replace('💭 Comentario: ', '') || ''
-            }
-            comments.push(comment)
-          } catch (error) {
-            console.error(`Error al leer archivo ${file}:`, error)
-          }
-        }
-
-        return NextResponse.json({ comments })
-      } catch (error) {
-        console.log('No se pudieron leer archivos en desarrollo:', error)
-      }
-    }
-
-    return NextResponse.json({ comments: [] })
+    return NextResponse.json({
+      comments: result.rows,
+      count: result.rows.length
+    })
 
   } catch (error) {
     console.error('Error al leer comentarios:', error)

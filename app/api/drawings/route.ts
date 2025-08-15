@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sql } from '@/lib/db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,52 +12,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // En Vercel no podemos escribir archivos, pero simulamos el guardado exitoso
-    const timestamp = new Date().toISOString()
-    const filename = `drawing-${timestamp.replace(/[:.]/g, '-')}.png`
-    const jsonFilename = `drawing-${timestamp.replace(/[:.]/g, '-')}.json`
+    const date = new Date().toLocaleDateString('es-ES')
+    const description = 'Dibujo creado en el Portal Mágico'
 
-    // Simular los metadatos que se guardarían
-    const metadata = {
-      filename: filename,
-      title: title,
-      timestamp: timestamp,
-      created: new Date().toLocaleString('es-ES'),
-      description: 'Dibujo creado en el Portal Mágico'
-    }
+    // Por ahora guardamos solo los metadatos
+    // Las imágenes se pueden subir a Vercel Blob en el futuro
+    const result = await sql`
+      INSERT INTO drawings (title, description, image_url, date)
+      VALUES (${title}, ${description}, ${'data:image/png;base64,' + imageData.substring(0, 100) + '...'}, ${date})
+      RETURNING id, title, description, image_url, date, timestamp;
+    `
 
-    // En desarrollo local, intentar guardar los archivos
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { writeFile, mkdir } = await import('fs/promises')
-        const { existsSync } = await import('fs')
-        const path = await import('path')
-        
-        const dataDir = path.join(process.cwd(), 'data', 'drawings')
-        if (!existsSync(dataDir)) {
-          await mkdir(dataDir, { recursive: true })
-        }
-        
-        // Guardar la imagen (convertir base64 a buffer)
-        const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '')
-        const buffer = Buffer.from(base64Data, 'base64')
-        const imagePath = path.join(dataDir, filename)
-        await writeFile(imagePath, buffer)
-        
-        // Guardar los metadatos
-        const jsonPath = path.join(dataDir, jsonFilename)
-        await writeFile(jsonPath, JSON.stringify(metadata, null, 2), 'utf-8')
-      } catch (error) {
-        console.log('No se pudieron guardar archivos en desarrollo:', error)
-      }
-    }
+    const savedDrawing = result.rows[0]
 
     return NextResponse.json({
       success: true,
-      message: 'Dibujo guardado exitosamente',
-      filename: filename,
-      metadata: metadata,
-      timestamp: timestamp
+      message: 'Dibujo guardado exitosamente en la base de datos',
+      drawing: savedDrawing
     })
 
   } catch (error) {
@@ -70,51 +42,17 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // En Vercel no podemos leer archivos, devolvemos un array vacío
-    if (process.env.NODE_ENV === 'development') {
-      try {
-        const { readdir, readFile } = await import('fs/promises')
-        const { existsSync } = await import('fs')
-        const path = await import('path')
-        
-        const dataDir = path.join(process.cwd(), 'data', 'drawings')
-        
-        if (!existsSync(dataDir)) {
-          return NextResponse.json({ drawings: [] })
-        }
+    // Obtener todos los dibujos de la base de datos
+    const result = await sql`
+      SELECT id, title, description, image_url, date, timestamp
+      FROM drawings
+      ORDER BY timestamp DESC;
+    `
 
-        const files = await readdir(dataDir)
-        const jsonFiles = files.filter(file => file.endsWith('.json'))
-
-        const drawings = []
-        for (const file of jsonFiles) {
-          try {
-            const filepath = path.join(dataDir, file)
-            const content = await readFile(filepath, 'utf-8')
-            const metadata = JSON.parse(content)
-            
-            // Verificar si existe la imagen correspondiente
-            const imageFilename = metadata.filename
-            const imagePath = path.join(dataDir, imageFilename)
-            
-            if (existsSync(imagePath)) {
-              drawings.push({
-                ...metadata,
-                imagePath: `/api/drawings/image/${imageFilename}` // Ruta para servir la imagen
-              })
-            }
-          } catch (error) {
-            console.error(`Error al leer archivo ${file}:`, error)
-          }
-        }
-
-        return NextResponse.json({ drawings })
-      } catch (error) {
-        console.log('No se pudieron leer archivos en desarrollo:', error)
-      }
-    }
-
-    return NextResponse.json({ drawings: [] })
+    return NextResponse.json({
+      drawings: result.rows,
+      count: result.rows.length
+    })
 
   } catch (error) {
     console.error('Error al leer dibujos:', error)
