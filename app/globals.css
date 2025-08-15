@@ -1,0 +1,1026 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes float-heart {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.1);
+  }
+}
+
+@keyframes bounce-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes bubble {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translateY(-100vh) rotate(0deg) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animación de globo inflado */
+@keyframes balloon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.animate-balloon {
+  animation: balloon 2s infinite;
+}
+
+/* Texto arcoíris animado */
+.rainbow-text {
+  background: linear-gradient(270deg, #ff0080, #ff8c00, #40e0d0, #8a2be2, #ff0080);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 3s linear infinite;
+}
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-heart {
+  animation: float-heart 6s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.animate-fall {
+  animation: fall 8s linear infinite;
+}
+
+.animate-bubble {
+  animation: bubble 10s ease-in-out infinite;
+}
+
+.animate-confetti-burst {
+  animation: confetti-burst 3s linear infinite;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Ocultar el ícono nativo del input date en todos los navegadores */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+}
+input[type="date"]::-webkit-input-placeholder {
+  color: #aaa;
+}
+input[type="date"]::-moz-placeholder {
+  color: #aaa;
+}
+input[type="date"]:-ms-input-placeholder {
+  color: #aaa;
+}
+input[type="date"]::placeholder {
+  color: #aaa;
+}
+
+/* Para Firefox */
+input[type="date"]::-moz-focus-inner,
+input[type="date"]::-moz-focus-outer {
+  border: 0;
+}
+
+/* Para Edge y otros navegadores */
+input[type="date"]::-ms-clear,
+input[type="date"]::-ms-reveal {
+  display: none;
+}
+
+.rainbow-text-glow {
+  background: linear-gradient(90deg, #fff700, #ff0080, #40e0d0, #ffe066, #fff700);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px #ffe066) drop-shadow(0 0 16px #fff700);
+  animation: rainbow-glow 3s linear infinite, pulse-glow 2s infinite;
+}
+@keyframes rainbow-glow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px #ffe066) drop-shadow(0 0 16px #fff700); }
+  50% { filter: drop-shadow(0 0 24px #fff700) drop-shadow(0 0 32px #ffe066); }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Animación de fade-in */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}
+
+/* Grid para sopa de letras */
+.grid-cols-15 {
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+}
+
+/* Animación de evolución del brillo del fondo */
+@keyframes glow-evolution {
+  0% {
+    background: linear-gradient(to right, #9ca3af, #9ca3af, #9ca3af);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  25% {
+    background: linear-gradient(to right, #f9a8d4, #f9a8d4, #f9a8d4);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 20px rgba(249, 168, 212, 0.3);
+  }
+  50% {
+    background: linear-gradient(to right, #f9a8d4, #a855f7, #a855f7);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 30px rgba(249, 168, 212, 0.5);
+  }
+  75% {
+    background: linear-gradient(to right, #ec4899, #a855f7, #a855f7);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 40px rgba(236, 72, 153, 0.6);
+  }
+  100% {
+    background: linear-gradient(to right, #ec4899, #a855f7, #a855f7);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 50px rgba(236, 72, 153, 0.8);
+  }
+}
+
+/* Animación de evolución del brillo del texto */
+@keyframes text-brightness {
+  0% {
+    opacity: 0.3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    filter: brightness(0.5);
+  }
+  25% {
+    opacity: 0.6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.3);
+    filter: brightness(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.5);
+    filter: brightness(1);
+  }
+  75% {
+    opacity: 0.9;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 20px rgba(255, 255, 255, 0.7);
+    filter: brightness(1.2);
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 25px rgba(255, 255, 255, 0.9);
+    filter: brightness(1.5);
+  }
+}
+
+.animate-glow-evolution {
+  animation: glow-evolution 4s ease-in-out infinite;
+}
+
+.animate-text-brightness {
+  animation: text-brightness 4s ease-in-out infinite;
+}
+
+/* Animación de flores cayendo del cielo */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes flower-fall-1 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(60vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(70vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-2 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(55vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(65vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-3 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(50vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(60vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-4 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  65% {
+    transform: translateY(45vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(55vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-5 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(40vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-6 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  55% {
+    transform: translateY(35vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(45vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flower-fall-7 {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(30vh) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(40vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes stem-grow-new {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: 6rem;
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-1 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-2 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-3 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-4 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-5 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-6 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bouquet-form-7 {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes leaf-appear-1 {
+  0% {
+    transform: translateX(-20px) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes leaf-appear-2 {
+  0% {
+    transform: translateX(20px) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes leaf-appear-3 {
+  0% {
+    transform: translateX(-15px) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ribbon-appear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+.animate-flower-fall-1 {
+  animation: flower-fall-1 3s ease-in forwards;
+}
+
+.animate-flower-fall-2 {
+  animation: flower-fall-2 3s ease-in 0.5s forwards;
+}
+
+.animate-flower-fall-3 {
+  animation: flower-fall-3 3s ease-in 1s forwards;
+}
+
+.animate-flower-fall-4 {
+  animation: flower-fall-4 3s ease-in 1.5s forwards;
+}
+
+.animate-flower-fall-5 {
+  animation: flower-fall-5 3s ease-in 2s forwards;
+}
+
+.animate-flower-fall-6 {
+  animation: flower-fall-6 3s ease-in 2.5s forwards;
+}
+
+.animate-flower-fall-7 {
+  animation: flower-fall-7 3s ease-in 3s forwards;
+}
+
+.animate-stem-grow-new {
+  animation: stem-grow-new 1s ease-out 3.5s forwards;
+}
+
+.animate-bouquet-form-1 {
+  animation: bouquet-form-1 1s ease-out 4s forwards;
+}
+
+.animate-bouquet-form-2 {
+  animation: bouquet-form-2 1s ease-out 4.2s forwards;
+}
+
+.animate-bouquet-form-3 {
+  animation: bouquet-form-3 1s ease-out 4.4s forwards;
+}
+
+.animate-bouquet-form-4 {
+  animation: bouquet-form-4 1s ease-out 4.6s forwards;
+}
+
+.animate-bouquet-form-5 {
+  animation: bouquet-form-5 1s ease-out 4.8s forwards;
+}
+
+.animate-bouquet-form-6 {
+  animation: bouquet-form-6 1s ease-out 5s forwards;
+}
+
+.animate-bouquet-form-7 {
+  animation: bouquet-form-7 1s ease-out 5.2s forwards;
+}
+
+.animate-leaf-appear-1 {
+  animation: leaf-appear-1 1s ease-out 5.5s forwards;
+}
+
+.animate-leaf-appear-2 {
+  animation: leaf-appear-2 1s ease-out 5.7s forwards;
+}
+
+.animate-leaf-appear-3 {
+  animation: leaf-appear-3 1s ease-out 5.9s forwards;
+}
+
+.animate-ribbon-appear {
+  animation: ribbon-appear 1s ease-out 6.2s forwards;
+}
+
+/* Animación de entrega del ramo */
+@keyframes delivery {
+  0% {
+    transform: translateX(-100px) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animación de entrega con delay */
+@keyframes delivery-delay {
+  0% {
+    transform: translateX(100px) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-bouquet-fall {
+  animation: bouquet-fall 2s ease-out forwards;
+}
+
+.animate-delivery {
+  animation: delivery 2s ease-out forwards;
+}
+
+.animate-delivery-delay {
+  animation: delivery-delay 2s ease-out 1s forwards;
+}
+
+/* Animación de estrellas fugaces */
+@keyframes shooting-star {
+  0% {
+    transform: translateX(-100px) translateY(0) rotate(45deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px)) translateY(calc(100vh + 100px)) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Animación de entrada para las tarjetas */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sombra 3D mejorada */
+.shadow-3xl {
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+/* Efecto de brillo mejorado */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Efecto de gradiente radial */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Efecto de glassmorphism mejorado */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Animación de flotación suave */
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+/* Efecto de neón */
+.neon-glow {
+  box-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+}
+
+/* Animación de rotación suave para iconos */
+@keyframes gentle-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-gentle-rotate {
+  animation: gentle-rotate 20s linear infinite;
+}
+
+/* Efecto de brillo pulsante */
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+  50% {
+    filter: brightness(1.2) drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Efecto de escala suave */
+@keyframes soft-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-soft-scale {
+  animation: soft-scale 3s ease-in-out infinite;
+}
+
+/* Animación de parpadeo de llama más realista */
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.animate-flicker {
+  animation: flicker 0.3s ease-in-out infinite;
+}
+
+/* Animación de flotación suave para velas */
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(0.5deg);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+/* Efecto de brillo de vela */
+@keyframes candle-glow {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 5px rgba(255, 193, 7, 0.3));
+  }
+  50% {
+    filter: brightness(1.1) drop-shadow(0 0 10px rgba(255, 193, 7, 0.5));
+  }
+}
+
+.animate-candle-glow {
+  animation: candle-glow 2s ease-in-out infinite;
+}
+
+.shooting-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(45deg, #fff, #ffd700, #fff);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 10px #fff,
+    0 0 20px #ffd700,
+    0 0 30px #fff;
+  animation: shooting-star 4s linear forwards;
+  z-index: 20;
+}
+
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  transform: translate(-50%, -50%) rotate(45deg);
+  animation: shooting-star 4s linear forwards;
+}
+
+/* Animaciones para el ramo de girasoles */
+@keyframes bouquet-delivery {
+  0% { 
+    transform: translateY(100vh) scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  50% { 
+    transform: translateY(-20px) scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes petal-fall {
+  0% { 
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% { 
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sunflower-glow {
+  0%, 100% { 
+    filter: brightness(1) drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+  }
+  50% { 
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 50% { border-color: transparent; }
+  51%, 100% { border-color: #f59e0b; }
+}
+
+@keyframes confetti-gold {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-bouquet-delivery {
+  animation: bouquet-delivery 1.5s ease-out forwards;
+}
+
+.animate-petal-fall {
+  animation: petal-fall 3s ease-in forwards;
+}
+
+.animate-sunflower-glow {
+  animation: sunflower-glow 2s ease-in-out infinite;
+}
+
+.animate-typewriter {
+  animation: typewriter 3s steps(40, end) forwards;
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
+.animate-confetti-gold {
+  animation: confetti-gold 2s ease-out forwards;
+}
