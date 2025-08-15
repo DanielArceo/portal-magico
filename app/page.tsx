@@ -1028,7 +1028,14 @@ export default function BirthdayLogin() {
               </Card>
             </div>
 
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-between mt-6">
+              <Button 
+                onClick={testAPIs}
+                variant="outline"
+                className="hover:bg-green-100 border-green-300 text-green-700 hover:text-green-800"
+              >
+                🧪 Probar APIs
+              </Button>
               <Button 
                 onClick={() => setShowDataModal(false)} 
                 variant="outline"
@@ -1104,6 +1111,74 @@ export default function BirthdayLogin() {
       console.error('Error cargando datos:', error)
       setSpecialMessage('Error al cargar los datos guardados. Intenta de nuevo.')
       setShowSpecialModal(true)
+    }
+  }
+
+  // Función para probar las APIs
+  const testAPIs = async () => {
+    try {
+      console.log('🧪 Iniciando pruebas de APIs...')
+      
+      // Probar API de comentarios
+      console.log('📝 Probando API de comentarios...')
+      const commentResponse = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          comment: 'Prueba de comentario - ' + new Date().toLocaleString(),
+          type: 'comentario',
+          rating: 5,
+          module: 'general'
+        })
+      })
+      
+      if (commentResponse.ok) {
+        const commentData = await commentResponse.json()
+        console.log('✅ Comentario guardado:', commentData)
+      } else {
+        console.error('❌ Error en API de comentarios:', await commentResponse.text())
+      }
+      
+      // Probar API de deseos
+      console.log('💫 Probando API de deseos...')
+      const wishResponse = await fetch('/api/wishes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          wish: 'Prueba de deseo - ' + new Date().toLocaleString(),
+          date: new Date().toLocaleDateString('es-ES')
+        })
+      })
+      
+      if (wishResponse.ok) {
+        const wishData = await wishResponse.json()
+        console.log('✅ Deseo guardado:', wishData)
+      } else {
+        console.error('❌ Error en API de deseos:', await wishResponse.text())
+      }
+      
+      // Probar API de dibujos
+      console.log('🎨 Probando API de dibujos...')
+      const drawingResponse = await fetch('/api/drawings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageData: 'prueba_base64_data_' + Date.now(),
+          title: 'Prueba de dibujo - ' + new Date().toLocaleString()
+        })
+      })
+      
+      if (drawingResponse.ok) {
+        const drawingData = await drawingResponse.json()
+        console.log('✅ Dibujo guardado:', drawingData)
+      } else {
+        console.error('❌ Error en API de dibujos:', await drawingResponse.text())
+      }
+      
+      console.log('🎉 Pruebas completadas. Revisa la consola para detalles.')
+      
+    } catch (error) {
+      console.error('💥 Error en pruebas de APIs:', error)
     }
   }
 

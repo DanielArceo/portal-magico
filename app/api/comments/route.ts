@@ -78,6 +78,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    // Intentar crear las tablas si no existen
+    try {
+      await createTables()
+    } catch (tableError) {
+      console.warn('Error creando tablas en GET, continuando...:', tableError)
+    }
+
     // Obtener todos los comentarios de la base de datos
     const result = await sql`
       SELECT id, text, type, rating, module, date, timestamp
@@ -92,8 +99,31 @@ export async function GET() {
 
   } catch (error) {
     console.error('Error al leer comentarios:', error)
+    
+    // Si es un error de tabla no encontrada, intentar crear las tablas
+    if (error instanceof Error && error.message.includes('relation "comments" does not exist')) {
+      try {
+        await createTables()
+        const result = await sql`
+          SELECT id, text, type, rating, module, date, timestamp
+          FROM comments
+          ORDER BY timestamp DESC;
+        `
+        return NextResponse.json({
+          comments: result.rows,
+          count: result.rows.length
+        })
+      } catch (retryError) {
+        console.error('Error en reintento GET:', retryError)
+        return NextResponse.json(
+          { error: 'Error al leer comentarios. Intenta de nuevo.' },
+          { status: 500 }
+        )
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error al leer comentarios. Intenta de nuevo.' },
       { status: 500 }
     )
   }
