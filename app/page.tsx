@@ -804,6 +804,8 @@ export default function BirthdayLogin() {
   const funnyErrorIndexRef = useRef(0)
   const [showSpecialModal, setShowSpecialModal] = useState(false)
   const [specialMessage, setSpecialMessage] = useState("")
+  const [showDataModal, setShowDataModal] = useState(false)
+  const [savedData, setSavedData] = useState<any>(null)
 
   // Guardar estados en localStorage cuando cambien
   useEffect(() => {
@@ -924,6 +926,107 @@ export default function BirthdayLogin() {
     )
   }
 
+  // MODAL DE DATOS GUARDADOS
+  if (showDataModal && savedData) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center p-2 sm:p-4 md:p-8 overflow-hidden">
+        <AnimatedBackground />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white/95 backdrop-blur-md rounded-lg shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-fade-in border-2 border-blue-200">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-blue-600 mb-2">📊 Datos Guardados</h2>
+              <p className="text-gray-600">Información guardada en la aplicación</p>
+            </div>
+            
+            <div className="grid gap-6">
+              {/* Deseos */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5 text-pink-500" />
+                    Deseos ({savedData.wishes.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {savedData.wishes.length > 0 ? (
+                    <div className="space-y-3">
+                      {savedData.wishes.map((wish: any, index: number) => (
+                        <div key={index} className="bg-pink-50 p-3 rounded-lg border border-pink-200">
+                          <p className="font-medium text-pink-800">"{wish.wish}"</p>
+                          <p className="text-sm text-pink-600 mt-1">{wish.date}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay deseos guardados</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Comentarios */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5 text-blue-500" />
+                    Comentarios ({savedData.comments.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {savedData.comments.length > 0 ? (
+                    <div className="space-y-3">
+                      {savedData.comments.map((comment: any, index: number) => (
+                        <div key={index} className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                          <p className="font-medium text-blue-800">"{comment.comment}"</p>
+                          <p className="text-sm text-blue-600 mt-1">{comment.date}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay comentarios guardados</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Dibujos */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gift className="h-5 w-5 text-purple-500" />
+                    Dibujos ({savedData.drawings.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {savedData.drawings.length > 0 ? (
+                    <div className="space-y-3">
+                      {savedData.drawings.map((drawing: any, index: number) => (
+                        <div key={index} className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                          <p className="font-medium text-purple-800">Dibujo #{index + 1}</p>
+                          <p className="text-sm text-purple-600 mt-1">{drawing.date}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay dibujos guardados</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <Button 
+                onClick={() => setShowDataModal(false)} 
+                variant="outline"
+                className="hover:bg-blue-100 border-blue-300 text-blue-700 hover:text-blue-800"
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // Actualizar la URL al cambiar de pantalla
   const goToStep = (step: string) => {
     const url = step ? `?step=${step}` : ""
@@ -937,6 +1040,15 @@ export default function BirthdayLogin() {
     if (date === '02091991') {
       normalizedDate = '1991-09-02';
     }
+    
+    // Verificar si es la fecha especial para ver datos (02/09/1991)
+    if (date === '02/09/1991' || date === '1991-09-02') {
+      console.log('¡Acceso a datos guardados!')
+      loadSavedData()
+      setShowError(false)
+      return
+    }
+    
     if (normalizedDate === BIRTHDAY_DATE) {
       setIsAuthenticated(true)
       setShowFelicidades(true)
@@ -945,16 +1057,37 @@ export default function BirthdayLogin() {
       goToStep("felicidades")
       setTimeout(() => setShowConfetti(false), 3000)
       funnyErrorIndexRef.current = 0 // Reiniciar el índice si acierta
-    } else if (normalizedDate === "1991-09-02") {
-      console.log('¡Entró a la condición especial de 1991-09-02!')
-      setSpecialMessage(`¡GUAU! ¿De verdad escribiste esta fecha? 🎉\n¡Alguien SÍ recordó mi cumpleaños! OMG, estoy shook. 😱\nComo premio por tu memoria legendaria (o fue suerte ), ¡te has ganado UNA PALABRA SECRETA! 🕵️‍♂️\n\nLa palabra es… [redoble de tambores]… ¡CURIOSIDAD! 🔍\n\n(¿O pensabas que sería \"pastel\"? 😏🎂)`)
-      setShowSpecialModal(true)
-      setShowError(false)
     } else {
       // Mostrar mensaje de error en orden secuencial
       setErrorMessage(funnyErrorMessages[funnyErrorIndexRef.current])
       setShowError(true)
       funnyErrorIndexRef.current = (funnyErrorIndexRef.current + 1) % funnyErrorMessages.length
+    }
+  }
+
+  // Función para cargar datos guardados
+  const loadSavedData = async () => {
+    try {
+      const [wishesResponse, commentsResponse, drawingsResponse] = await Promise.all([
+        fetch('/api/wishes'),
+        fetch('/api/comments'),
+        fetch('/api/drawings')
+      ])
+      
+      const wishes = wishesResponse.ok ? await wishesResponse.json() : []
+      const comments = commentsResponse.ok ? await commentsResponse.json() : []
+      const drawings = drawingsResponse.ok ? await drawingsResponse.json() : []
+      
+      setSavedData({
+        wishes,
+        comments,
+        drawings
+      })
+      setShowDataModal(true)
+    } catch (error) {
+      console.error('Error cargando datos:', error)
+      setSpecialMessage('Error al cargar los datos guardados. Intenta de nuevo.')
+      setShowSpecialModal(true)
     }
   }
 
