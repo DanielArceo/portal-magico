@@ -100,54 +100,56 @@ function CakeModule() {
         </p>
       </div>
 
-      {/* Pastel simple y correcto - Responsive */}
-      <div className="relative w-[320px] h-[280px] sm:w-[420px] sm:h-[350px] md:w-[500px] md:h-[400px] mx-auto mt-8 sm:mt-10 md:mt-12">
-        {/* Capa base - La más grande (abajo) */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[280px] h-20 sm:w-[380px] sm:h-24 md:w-[450px] md:h-28 bg-gradient-to-r from-pink-300 to-purple-400 rounded-t-3xl shadow-lg">
-          {/* Decoraciones base */}
-          <div className="absolute bottom-0 left-0 right-0 flex justify-around px-3 sm:px-4 md:px-6">
-            {[...Array(10)].map((_, i) => (
-              <div key={i} className="w-4 h-8 sm:w-5 sm:h-10 md:w-6 md:h-12 bg-gradient-to-t from-pink-200 to-white rounded-t-full"></div>
-            ))}
+      {/* Pastel mejorado y perfectamente centrado - Responsive */}
+      <div className="flex justify-center items-center w-full">
+        <div className="relative w-[280px] h-[240px] sm:w-[380px] sm:h-[320px] md:w-[450px] md:h-[380px] lg:w-[500px] lg:h-[400px] mt-8 sm:mt-10 md:mt-12">
+          {/* Capa base - La más grande (abajo) */}
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[240px] h-16 sm:w-[320px] sm:h-20 md:w-[380px] md:h-24 lg:w-[420px] lg:h-28 bg-gradient-to-r from-pink-300 to-purple-400 rounded-t-3xl shadow-lg">
+            {/* Decoraciones base */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-around px-2 sm:px-3 md:px-4 lg:px-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="w-3 h-6 sm:w-4 sm:h-8 md:w-5 md:h-10 lg:w-6 lg:h-12 bg-gradient-to-t from-pink-200 to-white rounded-t-full"></div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Capa media */}
-        <div className="absolute bottom-20 sm:bottom-24 md:bottom-28 left-1/2 transform -translate-x-1/2 w-[220px] h-16 sm:w-[300px] sm:h-20 md:w-[360px] md:h-24 bg-gradient-to-r from-purple-300 to-pink-400 rounded-t-3xl shadow-lg">
-          {/* Decoraciones media */}
-          <div className="absolute bottom-0 left-0 right-0 flex justify-around px-3 sm:px-4 md:px-5">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="w-3 h-6 sm:w-4 sm:h-8 md:w-5 md:h-10 bg-gradient-to-t from-purple-200 to-white rounded-t-full"></div>
-            ))}
+          {/* Capa media */}
+          <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-28 left-1/2 transform -translate-x-1/2 w-[180px] h-12 sm:w-[240px] sm:h-16 md:w-[280px] md:h-20 lg:w-[320px] lg:h-24 bg-gradient-to-r from-purple-300 to-pink-400 rounded-t-3xl shadow-lg">
+            {/* Decoraciones media */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-around px-2 sm:px-3 md:px-4 lg:px-5">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="w-2 h-4 sm:w-3 sm:h-6 md:w-4 md:h-8 lg:w-5 lg:h-10 bg-gradient-to-t from-purple-200 to-white rounded-t-full"></div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Capa superior - La más pequeña (arriba) */}
-        <div className="absolute bottom-40 sm:bottom-48 md:bottom-56 left-1/2 transform -translate-x-1/2 w-[160px] h-12 sm:w-[220px] sm:h-16 md:w-[260px] md:h-20 bg-gradient-to-r from-cyan-300 to-pink-400 rounded-t-3xl shadow-lg">
-          {/* Velas */}
-          <div className="absolute -top-10 sm:-top-12 md:-top-16 left-1/2 transform -translate-x-1/2 flex gap-3 sm:gap-4 md:gap-5">
-            {[0, 1, 2].map((index) => (
-              <button
-                key={index}
-                onClick={() => blowCandle(index)}
-                className={`relative transition-all duration-500 ${
-                  candlesBlown[index] 
-                    ? 'opacity-30 scale-75' 
-                    : 'hover:scale-110 cursor-pointer active:scale-95'
-                }`}
-                disabled={candlesBlown[index]}
-              >
-                {/* Vela */}
-                <div className="w-3 h-14 sm:w-3.5 sm:h-16 md:w-4 md:h-18 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-full shadow-md">
-                  {!candlesBlown[index] && (
-                    <>
-                      {/* Llama */}
-                      <div className="absolute -top-4 sm:-top-5 md:-top-6 left-1/2 transform -translate-x-1/2 w-4 h-6 sm:w-4.5 sm:h-7 md:w-5 md:h-8 bg-gradient-to-t from-orange-400 to-yellow-200 rounded-full animate-pulse"></div>
-                    </>
-                  )}
-                </div>
-              </button>
-            ))}
+          {/* Capa superior - La más pequeña (arriba) */}
+          <div className="absolute bottom-32 sm:bottom-40 md:bottom-48 lg:bottom-56 left-1/2 transform -translate-x-1/2 w-[120px] h-10 sm:w-[160px] sm:h-12 md:w-[200px] md:h-16 lg:w-[240px] lg:h-20 bg-gradient-to-r from-cyan-300 to-pink-400 rounded-t-3xl shadow-lg">
+            {/* Velas */}
+            <div className="absolute -top-8 sm:-top-10 md:-top-12 lg:-top-16 left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+              {[0, 1, 2].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => blowCandle(index)}
+                  className={`relative transition-all duration-500 ${
+                    candlesBlown[index] 
+                      ? 'opacity-30 scale-75' 
+                      : 'hover:scale-110 cursor-pointer active:scale-95'
+                  }`}
+                  disabled={candlesBlown[index]}
+                >
+                  {/* Vela */}
+                  <div className="w-2.5 h-12 sm:w-3 sm:h-14 md:w-3.5 md:h-16 lg:w-4 lg:h-18 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-full shadow-md">
+                    {!candlesBlown[index] && (
+                      <>
+                        {/* Llama */}
+                        <div className="absolute -top-3 sm:-top-4 md:-top-5 lg:-top-6 left-1/2 transform -translate-x-1/2 w-3 h-5 sm:w-3.5 sm:h-6 md:w-4 md:h-7 lg:w-5 lg:h-8 bg-gradient-to-t from-orange-400 to-yellow-200 rounded-full animate-pulse"></div>
+                      </>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
